@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Tape.cpp"
+#include "Record.cpp"
 int main() {
 	const size_t size = 1024;
 	Tape tape1("test.bin");
@@ -17,7 +18,11 @@ int main() {
 
 	tape1.CloseStream();
 
-	std::cout << tape1.IsBlockEqual(numbers, 2048);
+	std::cout << tape1._DEBUG_IsBlockEqual(numbers, 2048) << std::endl;
+
+	Record r1({ 1.,2.,3., 999999. });
+	Record r2({ .1,2.,4., 6., 1., 2., 6., 1060., 2. });
+	std::cout << (r1 < r2) << std::endl;
 
 	return 0;
 }

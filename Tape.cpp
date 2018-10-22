@@ -76,7 +76,7 @@ public:
 	}
 
 #if _DEBUG_ == 1
-	std::vector<double> ReadFromFile() {
+	std::vector<double> _DEBUG_ReadFromFile() {
 		file.open(filePath, std::ios::in | std::ios::binary);
 		while (file) {
 			double num;
@@ -87,10 +87,10 @@ public:
 		return _DEBUG_numsOut;
 	}
 
-	bool IsVectorEqual(std::vector<double> vec) {
+	bool _DEBUG_IsVectorEqual(std::vector<double> vec) {
 		return vec == this->_DEBUG_numsIn;
 	}
-	bool IsBlockEqual(std::vector<double> vec, size_t size) {
+	bool _DEBUG_IsBlockEqual(std::vector<double> vec, size_t size) {
 		for (int i = 0; i < size; i++)
 			if (vec[i] != this->_DEBUG_numsIn[i]) {
 				std::cout << "ERROR: MISMATCH AT INDEX " << i << std::endl;
