@@ -7,6 +7,7 @@
 
 #define DIST_UPPER_LIMIT 100.
 #define DIST_LOWER_LIMIT -100.
+#define SEPARATOR_VALUE 0.
 #define _DEBUG_ 1
 
 class Tape {
@@ -33,18 +34,10 @@ public:
 		file.close();
 	}
 
-	/*
-	double GetNext() {
-		double num = NAN;
-		if (file)
-			file.read(reinterpret_cast<char*>(&num), sizeof(double));
-		return num;
-	}
-	*/
 	std::vector<double> GetNextBlock() {
 		const size_t blockSize = 4096, arraySize = blockSize / sizeof(double);
 		int position = file.tellg();
-		double x[arraySize] = {};
+		double x[arraySize] = {};	// TODO: zera binarne?
 		if (file && (position + blockSize <= fileSize))
 			file.read(reinterpret_cast<char*>(&x), blockSize);
 		else if (file)
@@ -57,7 +50,7 @@ public:
 		file.open(filePath, std::ios::out | std::ios::binary);
 		std::default_random_engine gen(clock());
 		std::uniform_real_distribution<double> dist(DIST_LOWER_LIMIT, DIST_UPPER_LIMIT);
-		std::uniform_int_distribution<int> distInt(1, 15);		// TODO: czy to na pewno jest dobrze?
+		std::uniform_int_distribution<int> distInt(1, 15);
 		auto generator = [&]() {
 			return dist(gen);
 		};
@@ -75,29 +68,35 @@ public:
 #endif
 			}
 
-			double nan = NAN;
+			double nan = SEPARATOR_VALUE;
 			file.write(reinterpret_cast<char*>(&nan), sizeof(double));
 			_DEBUG_numsIn.push_back(nan);
 		}
 		file.close();
 	}
-	/*
-	void ReadFromFile() {
+
+#if _DEBUG_ == 1
+	std::vector<double> ReadFromFile() {
 		file.open(filePath, std::ios::in | std::ios::binary);
 		while (file) {
 			double num;
 			file.read(reinterpret_cast<char*>(&num), sizeof(double));
-#if DEBUG == 1
-			if (file) numsOut.push_back(num);
-#endif
+			if (file) _DEBUG_numsOut.push_back(num);
 		}
 		file.close();
+		return _DEBUG_numsOut;
 	}
-	*/
 
-#if _DEBUG_ == 1
 	bool IsVectorEqual(std::vector<double> vec) {
 		return vec == this->_DEBUG_numsIn;
+	}
+	bool IsBlockEqual(std::vector<double> vec, size_t size) {
+		for (int i = 0; i < size; i++)
+			if (vec[i] != this->_DEBUG_numsIn[i]) {
+				std::cout << "ERROR: MISMATCH AT INDEX " << i << std::endl;
+				return false;
+			}
+		return true;
 	}
 #endif
 };
