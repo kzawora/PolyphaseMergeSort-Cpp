@@ -1,15 +1,19 @@
 #include <iostream>
 #include "Tape.cpp"
 int main() {
-	const size_t tapeSize = 20, setCount = 3;
+	const size_t size = 1024;
 	Tape tape1("test.bin");
-	tape1.GenerateTape(tapeSize, setCount);
+	tape1.GenerateTape(size);
 
-	std::vector<double> numbers;
 	tape1.OpenStream();
-	for (int i = 0; i < tapeSize; i++)
-		numbers.push_back(tape1.GetNext());
+	std::vector<double> numbers = tape1.GetNextBlock();
+	std::vector<double> numbers2 = tape1.GetNextBlock();
+
+	numbers.insert(numbers.end(), numbers2.begin(), numbers2.end());
+
 	tape1.CloseStream();
+
+	std::cout << tape1.IsVectorEqual(numbers);
 
 	return 0;
 }

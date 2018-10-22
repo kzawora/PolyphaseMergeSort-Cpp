@@ -7,72 +7,81 @@
 
 #define DIST_UPPER_LIMIT 100.
 #define DIST_LOWER_LIMIT -100.
-#define DEBUG 1
+#define _DEBUG_ 1
 
 class Tape {
 	std::fstream file;
 	std::string filePath;
-#if DEBUG == 1
-	std::vector<double> numsIn;
-	std::vector<double> numsOut;
+	long long diskOpCounter;
+	size_t fileSize;
+#if _DEBUG_ == 1
+	std::vector<double> _DEBUG_numsIn;
+	std::vector<double> _DEBUG_numsOut;
 #endif
 
 public:
-	Tape(std::string _filePath) : filePath(_filePath) {}
+	Tape(std::string _filePath) : filePath(_filePath), diskOpCounter(0) {}
 	~Tape() {}
 
 	void OpenStream() {
+		std::ifstream file_temp(filePath, std::ios::binary | std::ios::ate);
+		this->fileSize = file_temp.tellg();
+		file_temp.close();
 		file.open(filePath, std::ios::in | std::ios::binary);
 	}
-	double GetNext() {
-		double num = 0xFFFFFFFFFFFFFFFF;
-		if (file)
-			file.read(reinterpret_cast<char*>(&num), sizeof(double));
-		return num;
-	}
-
 	void CloseStream() {
 		file.close();
 	}
 
-	void GenerateTape(int size, int setCount) {
+	/*
+	double GetNext() {
+		double num = NAN;
+		if (file)
+			file.read(reinterpret_cast<char*>(&num), sizeof(double));
+		return num;
+	}
+	*/
+	std::vector<double> GetNextBlock() {
+		const size_t blockSize = 4096, arraySize = blockSize / sizeof(double);
+		int position = file.tellg();
+		double x[arraySize] = {};
+		if (file && (position + blockSize <= fileSize))
+			file.read(reinterpret_cast<char*>(&x), blockSize);
+		else if (file)
+			file.read(reinterpret_cast<char*>(&x), fileSize - position);
+		diskOpCounter++;
+		return std::vector<double>(x, x + sizeof x / sizeof x[0]);
+	}
+
+	void GenerateTape(int size) {
 		file.open(filePath, std::ios::out | std::ios::binary);
 		std::default_random_engine gen(clock());
 		std::uniform_real_distribution<double> dist(DIST_LOWER_LIMIT, DIST_UPPER_LIMIT);
-		std::uniform_int_distribution<int> distInt(1, size - 2);		// TODO: czy to na pewno jest dobrze?
+		std::uniform_int_distribution<int> distInt(1, 15);		// TODO: czy to na pewno jest dobrze?
 		auto generator = [&]() {
 			return dist(gen);
 		};
 		auto generatorInt = [&]() {
 			return distInt(gen);
 		};
-
-		// TODO: zbiory puste?
-		static std::vector<int> setIndices;
-		for (int i = 0; i < setCount - 1; i++) {
-			int num = generatorInt();
-			while (std::find(setIndices.begin(), setIndices.end(), num) != setIndices.end())
-				num = generatorInt();
-#if DEBUG == 1
-			setIndices.push_back(num);
-#endif
-		}
-
 		for (int i = 0; i < size; i++) {
-			if (std::find(setIndices.begin(), setIndices.end(), i) != setIndices.end()) {
-				long long int num = 0xFFFFFFFFFFFFFFFF;
-				file.write(reinterpret_cast<char*>(&num), sizeof(double));
-			}
-			else {
+			int setSize = generatorInt();
+			;
+			while (setSize--) {
 				double num = generator();
 				file.write(reinterpret_cast<char*>(&num), sizeof(double));
-#if DEBUG == 1
-				numsIn.push_back(num);
+#if _DEBUG_ == 1
+				_DEBUG_numsIn.push_back(num);
 #endif
 			}
+
+			double nan = NAN;
+			file.write(reinterpret_cast<char*>(&nan), sizeof(double));
+			_DEBUG_numsIn.push_back(nan);
 		}
 		file.close();
 	}
+	/*
 	void ReadFromFile() {
 		file.open(filePath, std::ios::in | std::ios::binary);
 		while (file) {
@@ -84,4 +93,11 @@ public:
 		}
 		file.close();
 	}
+	*/
+
+#if _DEBUG_ == 1
+	bool IsVectorEqual(std::vector<double> vec) {
+		return vec == this->_DEBUG_numsIn;
+	}
+#endif
 };
