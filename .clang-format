@@ -1,0 +1,11 @@
+﻿---
+BasedOnStyle: LLVM
+AlignEscapedNewlinesLeft: 'true'
+AlignTrailingComments: 'true'
+AllowAllParametersOfDeclarationOnNextLine: 'true'
+AllowShortBlocksOnASingleLine: 'true'
+IndentWidth: '4'
+SpacesInParentheses: 'false'
+TabWidth: '4'
+
+...

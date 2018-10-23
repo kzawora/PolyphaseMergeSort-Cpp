@@ -1,20 +1,21 @@
 #include <vector>
 #pragma once
-class Record
-{
-  std::vector<double> values;
-public:
-  Record();
-  Record(std::vector<double> x);
+class Record {
+    std::vector<double> values;
 
-  long long recordPosition;
-  
-  void Add(double val);
-  size_t Size();
+  public:
+    Record();
+    Record(std::vector<double> x);
 
-  bool operator<(const Record &) const;
-  bool operator>(const Record &) const;
-  bool operator<=(const Record &) const;
-  bool operator>=(const Record &) const;
-  friend std::ostream &operator<<(std::ostream &, const Record &);
+    long long recordPosition;
+
+    void Add(double val);
+    size_t Size();
+    std::vector<double> GetValues();
+
+    bool operator<(const Record &) const;
+    bool operator>(const Record &) const;
+    bool operator<=(const Record &) const;
+    bool operator>=(const Record &) const;
+    friend std::ostream &operator<<(std::ostream &, const Record &);
 };

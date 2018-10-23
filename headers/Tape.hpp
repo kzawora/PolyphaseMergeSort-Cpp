@@ -1,6 +1,6 @@
-#include <vector>
-#include <fstream>
 #include "Record.hpp"
+#include <fstream>
+#include <vector>
 #pragma once
 
 #define BLOCK_SIZE 4096
@@ -9,22 +9,23 @@
 #define SEPARATOR_VALUE 0.
 #define _DEBUG_ 0
 
-class Tape
-{
-  long long diskOpCounter;
-  long long lastTapePos;
-  size_t fileSize;
-  std::fstream file;
-  std::string filePath;
+class Tape {
+    long long diskOpCounter;
+    long long lastTapePos;
+    size_t fileSize;
+    std::fstream file;
+    std::string filePath;
 
-  std::vector<double> GetNextBlock();
+    std::vector<double> GetNextBlock();
 
-public:
-  Tape(std::string _filePath);
-  ~Tape();
+  public:
+    Tape(std::string _filePath);
+    ~Tape();
 
-  void OpenStream();
-  void CloseStream();
-  void GenerateTape(int);
-  std::vector<Record> RecordBlockRead();
+    void OpenStream(int);
+    void CloseStream();
+    void GenerateTape(int);
+    long long GetDiskOpCount();
+    std::vector<Record> RecordBlockRead();
+    void SaveData(std::vector<Record>);
 };
