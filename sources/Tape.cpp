@@ -89,7 +89,8 @@ void Tape::SaveData(std::vector<Record> recs) {
         result.insert(result.end(), toInsert.begin(), toInsert.end());
         result.push_back(SEPARATOR_VALUE);
     }
-	double* toWrite = &result[0];
+    double *toWrite = &result[0];
     file.write(reinterpret_cast<char *>(toWrite),
                result.size() * sizeof(double));
+    diskOpCounter++; // DISKOP: file.write(...)
 }
