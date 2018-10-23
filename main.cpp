@@ -1,6 +1,6 @@
 #include <iostream>
-#include "Tape.cpp"
-#include "Record.cpp"
+#include "Tape.hpp"
+#include "Record.hpp"
 #pragma once
 
 int main()
@@ -29,10 +29,10 @@ int main()
 			std::cout << val;
 	}
 	tape1.CloseStream();
-	/*
+
 	Record r1({1., 2., 3., 999999.});
 	Record r2({.1, 2., 4., 6., 1., 2., 6., 1060., 2.});
-	std::cout << (r1 > r2) << std::endl;
-*/
+	std::cout << (r2 < r1) << std::endl;
+
 	return 0;
 }
