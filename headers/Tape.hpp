@@ -11,18 +11,20 @@
 
 class Tape
 {
+  long long diskOpCounter;
+  long long lastTapePos;
+  size_t fileSize;
   std::fstream file;
   std::string filePath;
-  long long diskOpCounter;
-  size_t fileSize;
-  long long lastTapePos;
+
   std::vector<double> GetNextBlock();
 
 public:
   Tape(std::string _filePath);
   ~Tape();
+
   void OpenStream();
   void CloseStream();
-  std::vector<Record> RecordBlockRead();
   void GenerateTape(int);
+  std::vector<Record> RecordBlockRead();
 };

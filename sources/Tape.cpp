@@ -64,7 +64,7 @@ std::vector<Record> Tape::RecordBlockRead()
 		}
 		counter++;
 	}
-	lastTapePos = static_cast<int>(file.tellg()) - record.values.size() * sizeof(double);
+	lastTapePos = static_cast<int>(file.tellg()) - record.Size() * sizeof(double);
 	file.seekg(lastTapePos, std::ios_base::beg);
 	diskOpCounter++; // DISKOP: file.seekg()
 	return records;  // co zrobic z ostatnim rekordem?
