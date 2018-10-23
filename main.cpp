@@ -24,7 +24,7 @@ int main()
 		counter++;
 		long long size = 0;
 		for (auto val : record)
-			size += (val.values.size() + 1) * sizeof(double);
+			size += (val.Size() + 1) * sizeof(double);
 		std::cout << "==================================== BLOCK: " << counter << ", RECORDS: " << record.size() << " (" << size << " bytes) "
 				  << " ====================================" << std::endl;
 		for (auto val : record)
