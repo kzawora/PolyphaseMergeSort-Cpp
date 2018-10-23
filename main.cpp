@@ -16,6 +16,8 @@ int main()
 	while (recs.back().size() != 0);
 	recs.pop_back();
 
+	tape1.CloseStream();
+
 	int counter = 0;
 	for (auto record : recs)
 	{
@@ -28,10 +30,9 @@ int main()
 		for (auto val : record)
 			std::cout << val;
 	}
-	tape1.CloseStream();
 
 	Record r1({1., 2., 3., 999999.});
-	Record r2({.1, 2., 4., 6., 1., 2., 6., 1060., 2.});
+	Record r2({.1, 2., 4., 6., 1., 2., 6., 1060., 2., 11111111111111.});
 	std::cout << (r2 < r1) << std::endl;
 
 	return 0;
