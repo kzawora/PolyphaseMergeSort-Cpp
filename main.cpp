@@ -24,5 +24,5 @@ int main() {
 	Record r2({ .1,2.,4., 6., 1., 2., 6., 1060., 2. });
 	std::cout << (r1 < r2) << std::endl;
 
-	return 0;
+	return 0; 
 }
