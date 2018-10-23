@@ -42,4 +42,8 @@ class Record
 	{
 		values.push_back(val);
 	}
+	size_t Size()
+	{
+		return this->values.size();
+	}
 };

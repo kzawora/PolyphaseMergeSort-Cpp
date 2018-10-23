@@ -11,7 +11,7 @@
 #define DIST_UPPER_LIMIT 100.
 #define DIST_LOWER_LIMIT -100.
 #define SEPARATOR_VALUE 0.
-#define _DEBUG_ 1
+#define _DEBUG_ 0
 
 class Tape
 {
@@ -66,9 +66,9 @@ class Tape
 		long long counter = recordPosition, lastCounter = 0;
 		for (auto val : block)
 		{
-			if (val != SEPARATOR_VALUE) 
+			if (val != SEPARATOR_VALUE)
 				record.Add(val);
-			else
+			else if (record.Size() != 0)
 			{
 				record.recordPosition = counter;
 				records.push_back(record);
@@ -77,9 +77,9 @@ class Tape
 			}
 			counter++;
 		}
-		lastTapePos = static_cast<int>(file.tellg()) - record.values.size()*sizeof(double);
+		lastTapePos = static_cast<int>(file.tellg()) - record.values.size() * sizeof(double);
 		file.seekg(lastTapePos, std::ios_base::beg);
-		std::cout << file.tellg() << std::endl;
+		//	std::cout << file.tellg() << std::endl;
 		diskOpCounter++; // DISKOP: file.seekg()
 		return records;  // co zrobic z ostatnim rekordem?
 	}
@@ -108,9 +108,11 @@ class Tape
 #endif
 			}
 
-			double nan = SEPARATOR_VALUE;
-			file.write(reinterpret_cast<char *>(&nan), sizeof(double));
-			_DEBUG_numsIn.push_back(nan);
+			double separator = SEPARATOR_VALUE;
+			file.write(reinterpret_cast<char *>(&separator), sizeof(double));
+#if _DEBUG_ == 1
+			_DEBUG_numsIn.push_back(separator);
+#endif
 		}
 		file.close();
 	}
