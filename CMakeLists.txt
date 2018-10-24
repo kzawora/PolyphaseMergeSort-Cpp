@@ -4,6 +4,8 @@ file(GLOB SBDProjekt1_SRC
     "*.cpp"
 	"sources/*.hpp"
     "sources/*.cpp"
+	"headers/*.hpp"
+    "headers/*.cpp"
 )
 
 include_directories(${PROJECT_SOURCE_DIR}/headers)

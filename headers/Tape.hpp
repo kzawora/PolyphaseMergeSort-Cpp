@@ -1,3 +1,4 @@
+#include "Block.hpp"
 #include "Record.hpp"
 #include <fstream>
 #include <vector>
@@ -26,6 +27,6 @@ class Tape {
     void CloseStream();
     void GenerateTape(int);
     long long GetDiskOpCount();
-    std::vector<Record> RecordBlockRead();
+    Block RecordBlockRead();
     void SaveData(std::vector<Record>);
 };

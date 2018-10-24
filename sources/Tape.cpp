@@ -33,7 +33,7 @@ void Tape::OpenStream(int mode) {
 }
 void Tape::CloseStream() { file.close(); }
 
-std::vector<Record> Tape::RecordBlockRead() {
+Block Tape::RecordBlockRead() {
     auto block = GetNextBlock();
     std::vector<Record> records;
     Record record;
@@ -55,8 +55,8 @@ std::vector<Record> Tape::RecordBlockRead() {
     lastTapePos =
         static_cast<int>(file.tellg()) - record.Size() * sizeof(double);
     file.seekg(lastTapePos, std::ios_base::beg);
-    diskOpCounter++; // DISKOP: file.seekg()
-    return records;  // co zrobic z ostatnim rekordem?
+    diskOpCounter++;       // DISKOP: file.seekg()
+    return Block(records); // co zrobic z ostatnim rekordem?
 }
 
 void Tape::GenerateTape(int size) {

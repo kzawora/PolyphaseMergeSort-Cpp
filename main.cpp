@@ -1,3 +1,4 @@
+#include "Block.hpp"
 #include "Record.hpp"
 #include "Tape.hpp"
 #include <iostream>
@@ -9,35 +10,34 @@ int main() {
     Tape tape2("test2.bin");
 
     tape1.GenerateTape(size);
-
     tape1.OpenStream(std::ios::in | std::ios::binary);
-    std::vector<std::vector<Record>> recs;
+    std::vector<Block> blocks;
     do
-        recs.push_back(tape1.RecordBlockRead());
-    while (recs.back().size() != 0);
-    recs.pop_back();
+        blocks.push_back(tape1.RecordBlockRead());
+    while (blocks.back().GetSize() != 0);
+    blocks.pop_back();
 
     tape1.CloseStream();
 
     int counter = 0;
-    for (auto record : recs) {
+    for (auto record : blocks) {
         counter++;
         long long size = 0;
-        for (auto val : record)
+        for (auto val : record.GetValues())
             size += (val.Size() + 1) * sizeof(double);
         std::cout << "==================================== BLOCK: " << counter
-                  << ", RECORDS: " << record.size() << " (" << size
+                  << ", RECORDS: " << record.GetSize() << " (" << size
                   << " bytes) "
                   << " ====================================" << std::endl;
-        for (auto val : record)
+        for (auto val : record.GetValues())
             std::cout << val;
     }
 
     tape2.OpenStream(std::ios::out | std::ios::binary);
     std::vector<Record> data;
-    for (auto record : recs)
-        for (auto val : record)
-            data.push_back(val);
+    for (auto block : blocks)
+        for (auto record : block.GetValues())
+            data.push_back(record);
     tape2.SaveData(data);
     tape2.CloseStream();
 
@@ -46,5 +46,14 @@ int main() {
     std::cout << (r2 < r1) << std::endl;
     std::cout << "Disk ops: " << tape1.GetDiskOpCount() << std::endl;
 
+    Block b({r1, r2, r2, r1});
+    for (auto i = 0; i < b.GetSize() - 1; i++) {
+        std::cout << b.GetNextRecord() << std::endl;
+    }
+    b.Push(r1);
+    b.Push(r2);
+    for (auto i = b.GetPos(); i < b.GetSize() - 1; i++) {
+        std::cout << b.GetNextRecord() << std::endl;
+    }
     return 0;
 }
