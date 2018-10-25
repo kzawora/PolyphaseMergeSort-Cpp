@@ -19,5 +19,6 @@ class Block {
     size_t GetPos();
     void Push(Record);
     size_t GetSize();
+    size_t Block::GetSizeInBytes();
     void Clear();
 };

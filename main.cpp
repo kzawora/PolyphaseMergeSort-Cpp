@@ -8,6 +8,8 @@
 #include <random>
 #pragma once
 
+#define DIST_UPPER_LIMIT 1e-3
+#define DIST_LOWER_LIMIT 1e-4
 static void GenerateTape(std::string path, int size) {
     std::fstream newFile;
     newFile.open(path, std::ios::out | std::ios::binary);
@@ -30,13 +32,17 @@ static void GenerateTape(std::string path, int size) {
 }
 
 int main() {
- //   GenerateTape("test.bin", 1 << 30);
+    GenerateTape("test.bin", (1 << 20));
     Tape tape1("test.bin", std::ios::binary | std::ios::in);
+    std::remove("out.bin");
+    Tape tape2("out.bin", std::ios::binary | std::ios::out | std::ios::app);
     int counter = 0;
     while (tape1.HasNext()) {
-        // std::cout << ++counter << '\t' << tape1.GetNext();
-        tape1.GetNext();
+        auto x = tape1.GetNext();
+        tape2.Push(x);
         counter++;
     }
+    tape2.BlockWrite();
+
     return 0;
 }

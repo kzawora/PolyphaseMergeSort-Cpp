@@ -17,7 +17,7 @@ class PolyphaseMergeSort {
         tapes.push_back(std::make_shared<Tape>("t3.bin", readMode));
     }
     int Distribute() {
-        std::shared_ptr<Tape> src, dest;
+        std::shared_ptr<Tape> src = tapes[0], dest = tapes[1];
         while (src->HasNext()) {
             Record rec = src->GetNext();
             if (true) // TODO: ogarnac to

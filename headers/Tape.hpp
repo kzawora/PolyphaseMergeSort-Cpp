@@ -4,9 +4,9 @@
 #include <vector>
 #pragma once
 
-#define BLOCK_SIZE 4096
-#define DIST_UPPER_LIMIT 100.
-#define DIST_LOWER_LIMIT -100.
+#define BLOCK_SIZE 16 * (1 << 10)
+#define WRITE_BLOCK_SIZE (1 << 20)
+
 #define SEPARATOR_VALUE std::nan("")
 #define _DEBUG_ 0
 
@@ -34,6 +34,5 @@ class Tape {
     bool HasNext();
     Record GetNext();
     void Push(Record);
-    void BlockWrite(Block);
-    void WriteAll();
+    void BlockWrite();
 };

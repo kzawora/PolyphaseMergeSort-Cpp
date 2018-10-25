@@ -22,5 +22,10 @@ Record Block::GetCurrentRecord() {
 void Block::SetPos(size_t pos) { this->currentPos = pos; }
 size_t Block::GetPos() { return this->currentPos; };
 size_t Block::GetSize() { return this->values.size(); };
+size_t Block::GetSizeInBytes() {
+    return (sizeof(std::vector<Record>) +
+            (sizeof(Record) * this->values.size()));
+}
+
 bool Block::HasNextRecord() { return currentPos + 1 < this->values.size(); }
 void Block::Clear() { this->values.clear(); }

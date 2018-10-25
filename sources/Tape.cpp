@@ -68,9 +68,9 @@ Block Tape::BlockRead() {
 
 long long Tape::GetDiskOpCount() { return this->diskOpCounter; }
 
-void Tape::BlockWrite(Block recs) {
+void Tape::BlockWrite() {
     std::vector<double> result;
-    for (auto val : recs.GetValues()) {
+    for (auto val : writeBlock.GetValues()) {
         std::vector<double> toInsert = val.GetValues();
         result.insert(result.end(), toInsert.begin(), toInsert.end());
         result.push_back(SEPARATOR_VALUE);
@@ -94,4 +94,12 @@ Record Tape::GetNext() {
 void Tape::ChangeMode(int mode) {
     this->CloseStream();
     this->OpenStream(mode);
+}
+
+void Tape::Push(Record rec) {
+    writeBlock.Push(rec);
+    if (this->writeBlock.GetSizeInBytes() >= BLOCK_SIZE) {
+        BlockWrite();
+        writeBlock.Clear();
+    }
 }
