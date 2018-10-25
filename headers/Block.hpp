@@ -7,6 +7,7 @@ class Block {
     size_t currentPos;
 
   public:
+    size_t endInTape;
     Block();
     Block(std::vector<Record>);
     ~Block();
@@ -14,7 +15,9 @@ class Block {
     Record GetNextRecord();
     Record GetCurrentRecord();
     void SetPos(size_t);
+    bool HasNextRecord();
     size_t GetPos();
     void Push(Record);
     size_t GetSize();
+    void Clear();
 };

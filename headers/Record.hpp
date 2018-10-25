@@ -7,8 +7,6 @@ class Record {
     Record();
     Record(std::vector<double> x);
 
-    size_t recordPosition;
-
     void Add(double val);
     size_t Size();
     std::vector<double> GetValues();

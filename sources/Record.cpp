@@ -28,9 +28,7 @@ void Record::Add(double val) { this->values.push_back(val); }
 size_t Record::Size() { return this->values.size(); }
 
 std::ostream &operator<<(std::ostream &os, const Record &dt) {
-    os << "RECORD (size: " << dt.values.size() << ",\trange: "
-       << (dt.recordPosition - dt.values.size()) * sizeof(double) << " - "
-       << (dt.recordPosition) * sizeof(double) << " bytes)\t";
+    os << "RECORD (size: " << dt.values.size() << ")\t";
     for (auto val : dt.values)
         os << val << " ";
     os << std::endl;
