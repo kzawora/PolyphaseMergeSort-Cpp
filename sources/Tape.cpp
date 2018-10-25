@@ -59,32 +59,11 @@ Block Tape::BlockRead() {
     }
     lastTapePos =
         static_cast<int>(file.tellg()) - record.Size() * sizeof(double);
-    file.seekg(lastTapePos, std::ios_base::beg);
     Block res(records);
     res.endInTape = (file.tellg());
+    file.seekg(lastTapePos, std::ios_base::beg);
     //   diskOpCounter++;       // DISKOP: file.seekg()
     return res; // co zrobic z ostatnim rekordem?
-}
-
-void Tape::GenerateTape(int size) {
-    std::fstream newFile;
-    newFile.open(this->filePath, std::ios::out | std::ios::binary);
-    std::default_random_engine gen(clock());
-    std::uniform_real_distribution<double> dist(DIST_LOWER_LIMIT,
-                                                DIST_UPPER_LIMIT);
-    std::uniform_int_distribution<int> distInt(1, 15);
-    auto generator = [&]() { return dist(gen); };
-    auto generatorInt = [&]() { return distInt(gen); };
-    for (int i = 0; i < size; i++) {
-        int setSize = generatorInt();
-        while (setSize--) {
-            double num = generator();
-            newFile.write(reinterpret_cast<char *>(&num), sizeof(double));
-        }
-        double separator = SEPARATOR_VALUE;
-        newFile.write(reinterpret_cast<char *>(&separator), sizeof(double));
-    }
-    newFile.close();
 }
 
 long long Tape::GetDiskOpCount() { return this->diskOpCounter; }

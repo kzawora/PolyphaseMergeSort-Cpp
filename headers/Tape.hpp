@@ -25,11 +25,11 @@ class Tape {
     bool isOpen;
     void OpenStream(int);
     void CloseStream();
+
   public:
     Tape(std::string _filePath, int);
     ~Tape();
     void ChangeMode(int);
-    void GenerateTape(int);
     long long GetDiskOpCount();
     bool HasNext();
     Record GetNext();

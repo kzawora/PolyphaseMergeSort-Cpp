@@ -9,7 +9,6 @@ class Record {
     void Push(double val);
     size_t Size();
     std::vector<double> GetValues();
-
     bool operator<(const Record &) const;
     bool operator>(const Record &) const;
     bool operator<=(const Record &) const;
