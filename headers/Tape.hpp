@@ -16,19 +16,19 @@ class Tape {
     size_t fileSize;
     std::fstream file;
     std::string filePath;
+    int mode;
     std::vector<double> GetNextBlock();
     Block readBlock;
     Block writeBlock;
     bool HasNextBlock();
     Block BlockRead();
     bool isOpen;
-
+    void OpenStream(int);
+    void CloseStream();
   public:
     Tape(std::string _filePath, int);
     ~Tape();
-
-    void OpenStream(int);
-    void CloseStream();
+    void ChangeMode(int);
     void GenerateTape(int);
     long long GetDiskOpCount();
     bool HasNext();

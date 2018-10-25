@@ -6,8 +6,7 @@ class Record {
   public:
     Record();
     Record(std::vector<double> x);
-
-    void Add(double val);
+    void Push(double val);
     size_t Size();
     std::vector<double> GetValues();
 

@@ -24,7 +24,7 @@ bool Record::operator>(const Record &rhs) const { return rhs < *this; }
 bool Record::operator<=(const Record &rhs) const { return !(*this > rhs); }
 bool Record::operator>=(const Record &rhs) const { return !(*this < rhs); }
 
-void Record::Add(double val) { this->values.push_back(val); }
+void Record::Push(double val) { this->values.push_back(val); }
 size_t Record::Size() { return this->values.size(); }
 
 std::ostream &operator<<(std::ostream &os, const Record &dt) {

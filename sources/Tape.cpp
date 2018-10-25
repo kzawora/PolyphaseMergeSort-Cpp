@@ -50,7 +50,7 @@ Block Tape::BlockRead() {
     diskOpCounter++; // DISKOP: file.tellg()
     for (auto val : block) {
         if (!std::isnan(val))
-            record.Add(val);
+            record.Push(val);
         else if (record.Size() != 0) {
             records.push_back(record);
             Record tmp;
@@ -110,4 +110,9 @@ Record Tape::GetNext() {
     if (readBlock.GetSize() == 0 || readBlock.HasNextRecord() == false)
         this->readBlock = this->BlockRead();
     return this->readBlock.GetNextRecord();
+}
+
+void Tape::ChangeMode(int mode) {
+    this->CloseStream();
+    this->OpenStream(mode);
 }
