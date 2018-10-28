@@ -5,23 +5,25 @@
 enum io {
     READONLY = std::ios::in | std::ios::binary,
     WRITEONLY = std::ios::out | std::ios::binary | std::ios::app,
-    READWRITE = std::ios::out | std::ios::binary | std::ios::app
 };
 
 class PolyphaseMergeSort {
     std::vector<std::shared_ptr<Tape>> tapes;
+    std::string filename;
 
   public:
     PolyphaseMergeSort(std::shared_ptr<Tape> inputTape) {}
-    PolyphaseMergeSort(std::string filename) {
+    PolyphaseMergeSort(std::string _filename) : filename(_filename) {
 
-        tapes.push_back(std::make_shared<Tape>(filename, READONLY));
+        tapes.push_back(std::make_shared<Tape>(_filename, READONLY));
         std::remove("t2.bin");
-        tapes.push_back(std::make_shared<Tape>("t2.bin", READWRITE));
+        tapes.push_back(std::make_shared<Tape>("t2.bin", WRITEONLY));
         std::remove("t3.bin");
-        tapes.push_back(std::make_shared<Tape>("t3.bin", READWRITE));
+        tapes.push_back(std::make_shared<Tape>("t3.bin", WRITEONLY));
     }
-    void Distribute() {
+    int Distribute() {
+        int phases = 0;
+
         tapes[0]->ChangeMode(READONLY);
         tapes[1]->ChangeMode(WRITEONLY);
         tapes[2]->ChangeMode(WRITEONLY);
@@ -35,45 +37,22 @@ class PolyphaseMergeSort {
                 fibCopy = fib;
                 fib = fib + fibOld;
                 fibOld = fibCopy;
+                phases++;
             }
             dest->Push(rec);
         }
         dest->dummies = fib - dest->seriesCount;
         tapes[1]->BlockWrite();
         tapes[2]->BlockWrite();
+        return phases;
     }
     void Print() {
-        tapes[0]->ChangeMode(READONLY);
-        tapes[1]->ChangeMode(READONLY);
-        tapes[2]->ChangeMode(READONLY);
-        
-        long long counter = 0;
-        std::cout << "==================== TAPE 0 ===================="
-                  << std::endl;
-        while (tapes[0]->HasNext()) {
-            auto x = tapes[0]->GetNext();
-            if (tapes[0]->inSeries == false)
-                std::cout << "SERIES BREAK" << std::endl;
-            std::cout << ++counter << '\t' << x;
-        }
-        counter = 0;
-        std::cout << "==================== TAPE 1 ===================="
-                  << std::endl;
-        while (tapes[1]->HasNext()) {
-            auto x = tapes[1]->GetNext();
-            if (tapes[1]->inSeries == false)
-                std::cout << "SERIES BREAK" << std::endl;
-            std::cout << ++counter << '\t' << x;
-        }
-        counter = 0;
-        std::cout << "==================== TAPE 2 ===================="
-                  << std::endl;
-        while (tapes[2]->HasNext()) {
-            auto x = tapes[2]->GetNext();
-            if (tapes[2]->inSeries == false)
-                std::cout << "SERIES BREAK" << std::endl;
-            std::cout << ++counter << '\t' << x;
-        }
+        std::cout << "PRINTING TAPES:" << std::endl;
+        //       for (auto tape : tapes) {
+        std::cout << "==================== TAPE - CURRENT "
+                  << tapes[1]->GetCurrent();
+        std::cout << *tapes[1] << std::endl;
+        //     }
     }
     void Merge() {
         tapes[0]->CloseStream();
@@ -82,11 +61,11 @@ class PolyphaseMergeSort {
 
         std::shared_ptr<Tape> tape1 = tapes[1], tape2 = tapes[2];
         Record record1, record2;
-        tape1->ChangeMode(READONLY);
-        tape2->ChangeMode(READONLY);
+        // TODO: tu sie psuje
+        // tape1->ChangeMode(READONLY);
+        // tape2->ChangeMode(READONLY);
 
         while (tape1->HasNext() && tape2->HasNext()) {
-            // update()
             if (tape1->dummies > 0) {
                 record1 = Record();
                 tape1->dummies--;
@@ -120,28 +99,30 @@ class PolyphaseMergeSort {
                 }
                 return minimum;
             };
-
             while (true) {
-                Record current = GetMinimum();
-                if (current.IsEmpty())
+                Record min = GetMinimum();
+                if (min.IsEmpty())
                     break;
-                tapes[0]->Push(current);
+                tapes[0]->Push(min);
             }
         }
         tapes[0]->BlockWrite();
-        tape1->BlockWrite();
-        tape2->BlockWrite();
-        auto temp = tapes[0];
-        // flush temp
-        temp->ChangeMode(READWRITE);
+        //     Print();
+        tapes[0]->ChangeMode(READONLY);
 
-        if (tapes[1]->HasNext()) {
-            tapes[0] = tapes[2];
-            tapes[2] = temp;
-        } else {
-            tapes[0] = tapes[1];
-            tapes[1] = temp;
-        }
+        auto temp = tapes[0];
+        if (tapes[1]->HasNext())
+            std::swap(tapes[0], tapes[2]);
+        else
+            std::swap(tapes[0], tapes[1]);
+    }
+    void Sort() {
+        int phases = Distribute();
+        tapes[1]->ChangeMode(READONLY);
+        tapes[2]->ChangeMode(READONLY);
+
+        for (int i = 0; i < phases; i++)
+            Merge();
     }
     ~PolyphaseMergeSort() {}
 };

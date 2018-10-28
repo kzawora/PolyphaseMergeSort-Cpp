@@ -31,29 +31,16 @@ static void GenerateTape(std::string path, int size) {
     newFile.close();
 }
 
-int get_file_size(std::string filename) // path to file
-{
-    FILE *p_file = NULL;
-    p_file = fopen(filename.c_str(), "rb");
-    fseek(p_file, 0, SEEK_END);
-    int size = ftell(p_file);
-    fclose(p_file);
-    return size;
-}
-
 int main() {
-    GenerateTape("test.bin", (20));
+    GenerateTape("test.bin", (50));
     PolyphaseMergeSort x("test.bin");
-    /*
-    std::cout << std::endl << "BEFORE DIST:" << std::endl;
-
-    /*
-       Tape t1("t2.bin", std::ios::in | std::ios::binary);
-       while (t1.HasNext())
-           std::cout << t1.GetNext();
-       //    std::cout << std::endl << "AFTER DIST" << std::endl;
-       */
-    x.Distribute();
+/*
+    Tape t1("t2.bin", std::ios::in | std::ios::binary | std::ios::app);
+    while (t1.HasNext())
+        std::cout << t1.GetNext();
+    //    std::cout << std::endl << "AFTER DIST" << std::endl;
+*/
+    x.Sort();
     x.Print();
     return 0;
 }

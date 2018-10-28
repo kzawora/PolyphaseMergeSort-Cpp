@@ -36,16 +36,17 @@ class Tape {
     void WipeWrite(int);
     void WipeAll(int);
 
-
     Tape(std::string _filePath, int);
     ~Tape();
     void ChangeMode(int);
     long long GetDiskOpCount();
     bool HasNext();
-    std::string GetFilePath();
+    std::string GetFilePath() const;
     Record GetNext();
     Record PeekNext();
     Record GetCurrent();
     void Push(Record);
     void BlockWrite();
+
+    friend std::ostream &operator<<(std::ostream &, const Tape &);
 };

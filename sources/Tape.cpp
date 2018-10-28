@@ -78,6 +78,7 @@ void Tape::BlockWrite() {
     double *toWrite = &result[0];
     file.write(reinterpret_cast<char *>(toWrite),
                result.size() * sizeof(double));
+    file.flush();
     diskOpCounter++; // DISKOP: file.write(...)
 }
 bool Tape::HasNext() {
@@ -128,4 +129,18 @@ void Tape::Push(Record rec) {
     }
 }
 
-std::string Tape::GetFilePath() { return this->filePath; };
+std::string Tape::GetFilePath() const { return this->filePath; }
+
+std::ostream &operator<<(std::ostream &os, const Tape &tp) {
+    std::string name = tp.GetFilePath();
+    auto tape = std::make_shared<Tape>(name, std::ios::in | std::ios::binary);
+
+    long long counter = 0;
+    while (tape->HasNext()) {
+        auto x = tape->GetNext();
+        if (tape->inSeries == false)
+            os << "SERIES BREAK" << std::endl;
+        os << ++counter << '\t' << x;
+    }
+    return os;
+}
