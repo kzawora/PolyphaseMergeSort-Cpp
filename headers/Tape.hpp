@@ -8,7 +8,7 @@
 #define WRITE_BLOCK_SIZE (1 << 20)
 
 #define SEPARATOR_VALUE std::nan("")
-#define _DEBUG_ 0
+#define _DEBUG_ 1
 
 class Tape {
     long long diskOpCounter;
@@ -24,15 +24,28 @@ class Tape {
     Block BlockRead();
     bool isOpen;
     void OpenStream(int);
-    void CloseStream();
+    Record lastRecord;
 
   public:
+    bool inSeries;
+    size_t seriesCount;
+    int dummies;
+    void CloseStream();
+
+    void WipeRead(int);
+    void WipeWrite(int);
+    void WipeAll(int);
+
+
     Tape(std::string _filePath, int);
     ~Tape();
     void ChangeMode(int);
     long long GetDiskOpCount();
     bool HasNext();
+    std::string GetFilePath();
     Record GetNext();
+    Record PeekNext();
+    Record GetCurrent();
     void Push(Record);
     void BlockWrite();
 };

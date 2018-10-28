@@ -13,6 +13,7 @@ class Block {
     ~Block();
     std::vector<Record> GetValues();
     Record GetNextRecord();
+    Record PeekNextRecord();
     Record GetCurrentRecord();
     void SetPos(size_t);
     bool HasNextRecord();

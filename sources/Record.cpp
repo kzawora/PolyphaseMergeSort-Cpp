@@ -4,8 +4,11 @@
 #include <vector>
 #pragma once
 
+#define _DEBUG_SORT_ 1
+
 Record::Record() {}
 Record::Record(std::vector<double> x) : values(x) {}
+
 bool Record::operator<(const Record &rhs) const {
     std::vector<double> lCopy = this->values, rCopy = rhs.values;
     auto descendingComparator = [](double x, double y) { return x > y; };
@@ -24,7 +27,13 @@ bool Record::operator>(const Record &rhs) const { return rhs < *this; }
 bool Record::operator<=(const Record &rhs) const { return !(*this > rhs); }
 bool Record::operator>=(const Record &rhs) const { return !(*this < rhs); }
 
-void Record::Push(double val) { this->values.push_back(val); }
+void Record::Push(double val) {
+    this->values.push_back(val);
+#if _DEBUG_SORT_ == 1
+    auto descendingComparator = [](double x, double y) { return x > y; };
+    std::sort(values.begin(), values.end(), descendingComparator);
+#endif
+}
 size_t Record::Size() { return this->values.size(); }
 
 std::ostream &operator<<(std::ostream &os, const Record &dt) {
@@ -35,3 +44,5 @@ std::ostream &operator<<(std::ostream &os, const Record &dt) {
     return os;
 }
 std::vector<double> Record::GetValues() { return this->values; };
+
+bool Record::IsEmpty() { return this->values.size() == 0; }

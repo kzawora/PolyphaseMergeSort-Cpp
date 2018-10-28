@@ -7,6 +7,13 @@
 #include <string>
 #pragma once
 
+Tape::Tape(std::string _filePath, int mode)
+    : filePath(_filePath), diskOpCounter(0), lastTapePos(0), seriesCount(0) {
+    if (this->file.is_open() == false)
+        this->OpenStream(mode);
+}
+Tape::~Tape() { file.close(); }
+
 std::vector<double> Tape::GetNextBlock() {
     const size_t arraySize = BLOCK_SIZE / sizeof(double);
     int position = static_cast<int>(file.tellg());
@@ -25,13 +32,6 @@ bool Tape::HasNextBlock() {
         return true;
     return false;
 };
-
-Tape::Tape(std::string _filePath, int mode)
-    : filePath(_filePath), diskOpCounter(0), lastTapePos(0) {
-    if (this->file.is_open() == false)
-        this->OpenStream(mode);
-}
-Tape::~Tape() { file.close(); }
 
 void Tape::OpenStream(int mode) {
     std::ifstream file_temp(filePath, std::ios::binary | std::ios::ate);
@@ -88,18 +88,44 @@ bool Tape::HasNext() {
 Record Tape::GetNext() {
     if (readBlock.GetSize() == 0 || readBlock.HasNextRecord() == false)
         this->readBlock = this->BlockRead();
-    return this->readBlock.GetNextRecord();
+    auto res = this->readBlock.GetNextRecord();
+    this->inSeries =
+        lastRecord.IsEmpty() || lastRecord <= res; // TODO: nierownosci
+    this->lastRecord = res;
+    return res;
+}
+Record Tape::GetCurrent() { return this->readBlock.GetCurrentRecord(); }
+Record Tape::PeekNext() {
+    auto block =
+        (readBlock.GetSize() == 0 || readBlock.HasNextRecord() == false)
+            ? this->BlockRead()
+            : this->readBlock;
+
+    auto res = block.PeekNextRecord();
+    return res;
 }
 
 void Tape::ChangeMode(int mode) {
     this->CloseStream();
     this->OpenStream(mode);
+    this->inSeries = true;
+    this->lastTapePos = (0);
+    this->seriesCount = (0);
+    this->readBlock = Block();
+    this->writeBlock = Block();
 }
 
 void Tape::Push(Record rec) {
+    if (this->lastRecord.IsEmpty() ||
+        this->lastRecord > rec) // TODO: nierownosci
+        this->seriesCount++;
+
+    this->lastRecord = rec;
     writeBlock.Push(rec);
     if (this->writeBlock.GetSizeInBytes() >= BLOCK_SIZE) {
         BlockWrite();
         writeBlock.Clear();
     }
 }
+
+std::string Tape::GetFilePath() { return this->filePath; };

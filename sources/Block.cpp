@@ -12,12 +12,18 @@ Record Block::GetNextRecord() {
     this->currentPos++;
     return this->GetCurrentRecord();
 };
+Record Block::PeekNextRecord() {
+    auto res = GetNextRecord();
+    this->currentPos--;
+    return res;
+}
 Record Block::GetCurrentRecord() {
     if (currentPos < 0)
         throw "No current record!";
     if (this->currentPos < this->values.size())
         return this->values[this->currentPos];
-    throw "Block out of bounds!";
+    //    throw "Block out of bounds!";
+    return Record();
 };
 void Block::SetPos(size_t pos) { this->currentPos = pos; }
 size_t Block::GetPos() { return this->currentPos; };
