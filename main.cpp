@@ -32,7 +32,7 @@ static void GenerateTape(std::string path, int size) {
 }
 
 int main() {
-    GenerateTape("test.bin", (50));
+    GenerateTape("test.bin", (4*1024));
     PolyphaseMergeSort x("test.bin");
 /*
     Tape t1("t2.bin", std::ios::in | std::ios::binary | std::ios::app);
