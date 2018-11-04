@@ -1,10 +1,4 @@
-#include "Tape.hpp"
-#include <algorithm>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <random>
-#include <string>
+#include "CommonHeader.hpp"
 #pragma once
 
 Tape::Tape(std::string _filePath, int mode)

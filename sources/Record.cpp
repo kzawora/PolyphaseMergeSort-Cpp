@@ -1,10 +1,5 @@
-#include "Record.hpp"
-#include <algorithm>
-#include <iostream>
-#include <vector>
+#include "CommonHeader.hpp"
 #pragma once
-
-#define _DEBUG_SORT_ 1
 
 Record::Record() {}
 Record::Record(std::vector<double> x) : values(x) {}

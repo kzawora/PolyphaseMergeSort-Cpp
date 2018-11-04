@@ -4,12 +4,6 @@
 #include <vector>
 #pragma once
 
-#define BLOCK_SIZE 16 * (1 << 10)
-#define WRITE_BLOCK_SIZE (1 << 20)
-
-#define SEPARATOR_VALUE std::nan("")
-#define _DEBUG_ 1
-
 class Tape {
     long long diskOpCounter;
     long long lastTapePos;

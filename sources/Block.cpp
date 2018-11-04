@@ -1,5 +1,4 @@
-#include "Block.hpp"
-#include <iostream>
+#include "CommonHeader.hpp"
 #pragma once
 Block::Block() : currentPos(-1), endInTape(0){};
 Block::Block(std::vector<Record> recs) : currentPos(-1), endInTape(0) {
