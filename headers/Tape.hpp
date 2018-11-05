@@ -21,6 +21,7 @@ class Tape {
     Record lastRecord;
     bool restore;
   public:
+    int popCnt;
     bool inSeries;
     size_t seriesCount;
     int dummies;

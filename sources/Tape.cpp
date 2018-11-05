@@ -2,11 +2,14 @@
 #pragma once
 
 Tape::Tape(std::string _filePath, int mode)
-    : filePath(_filePath), diskOpCounter(0), lastTapePos(0), seriesCount(0) {
+    : filePath(_filePath), diskOpCounter(0), lastTapePos(0), seriesCount(0),
+      restore(false), popCnt(0), dummies(0) {
     if (this->file.is_open() == false)
         this->OpenStream(mode);
 }
 Tape::~Tape() { file.close(); }
+
+void Tape::Restore() { this->restore = true; }
 
 std::vector<double> Tape::GetNextBlock() {
     const size_t arraySize = BLOCK_SIZE / sizeof(double);
@@ -76,17 +79,24 @@ void Tape::BlockWrite() {
     diskOpCounter++; // DISKOP: file.write(...)
 }
 bool Tape::HasNext() {
+    if (restore)
+        return true;
     if (readBlock.HasNextRecord())
         return true;
     return this->HasNextBlock();
 }
 Record Tape::GetNext() {
+    if (restore) {
+        restore = false;
+        return this->lastRecord;
+    }
     if (readBlock.GetSize() == 0 || readBlock.HasNextRecord() == false)
         this->readBlock = this->BlockRead();
     auto res = this->readBlock.GetNextRecord();
     this->inSeries =
         lastRecord.IsEmpty() || lastRecord <= res; // TODO: nierownosci
     this->lastRecord = res;
+    popCnt++;
     return res;
 }
 Record Tape::GetCurrent() { return this->readBlock.GetCurrentRecord(); }
@@ -108,6 +118,8 @@ void Tape::ChangeMode(int mode) {
     this->seriesCount = (0);
     this->readBlock = Block();
     this->writeBlock = Block();
+    this->restore = false;
+    this->popCnt = 0;
 }
 
 void Tape::Push(Record rec) {
@@ -123,18 +135,33 @@ void Tape::Push(Record rec) {
     }
 }
 
+void Tape::Clear() {
+    this->CloseStream();
+    std::remove(filePath.c_str());
+    this->OpenStream(std::ios::out | std::ios::binary | std::ios::app);
+    this->inSeries = true;
+    this->lastTapePos = (0);
+    this->seriesCount = (0);
+    this->readBlock = Block();
+    this->writeBlock = Block();
+    this->restore = false;
+    this->popCnt = 0;
+}
+
 std::string Tape::GetFilePath() const { return this->filePath; }
 
 std::ostream &operator<<(std::ostream &os, const Tape &tp) {
     std::string name = tp.GetFilePath();
     auto tape = std::make_shared<Tape>(name, std::ios::in | std::ios::binary);
 
-    long long counter = 0;
+    long long counter = 1;
     while (tape->HasNext()) {
         auto x = tape->GetNext();
-        if (tape->inSeries == false)
-            os << "SERIES BREAK" << std::endl;
-        os << ++counter << '\t' << x;
+        if (++counter + (int)tp.restore > tp.popCnt) {
+            if (tape->inSeries == false)
+                os << "SERIES BREAK" << std::endl;
+            os << counter << '\t' << x;
+        }
     }
     return os;
 }

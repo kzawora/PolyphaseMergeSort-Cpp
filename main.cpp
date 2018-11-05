@@ -1,8 +1,8 @@
-#include "Block.hpp"
-#include "CommonHeader.hpp"
-#include "PMSTest.cpp"
-#include "Record.hpp"
-#include "Tape.hpp"
+//#include "Block.hpp"
+//#include "CommonHeader.hpp"
+#include "PMSTest2.cpp"
+//#include "Record.hpp"
+//#include "Tape.hpp"
 #include "helpers.cpp"
 #include <iostream>
 #pragma once
@@ -38,10 +38,10 @@ int main() {
             std::cout << "NOT EQUAL!" << std::endl;
     }
     */
-    PMSTest x("test.bin");
+    GenerateTape("test.bin", 1 << 20);
+    PMSTest2 x("test.bin");
     x.Sort();
-
-    x.Print();
+    x.IsSorted();
 
     return 0;
 }

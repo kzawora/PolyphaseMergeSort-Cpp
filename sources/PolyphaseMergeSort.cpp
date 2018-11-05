@@ -1,5 +1,9 @@
 #include "CommonHeader.hpp"
 #pragma once
+enum io {
+    READONLY = std::ios::in | std::ios::binary,
+    WRITEONLY = std::ios::out | std::ios::binary | std::ios::app,
+};
 
 PolyphaseMergeSort::PolyphaseMergeSort(std::shared_ptr<Tape> inputTape) {}
 PolyphaseMergeSort::PolyphaseMergeSort(std::string _filename)

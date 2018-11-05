@@ -3,10 +3,6 @@
 #include <vector>
 #include <memory>
 #pragma once
-enum io {
-    READONLY = std::ios::in | std::ios::binary,
-    WRITEONLY = std::ios::out | std::ios::binary | std::ios::app,
-};
 
 class PolyphaseMergeSort {
     std::vector<std::shared_ptr<Tape>> tapes;

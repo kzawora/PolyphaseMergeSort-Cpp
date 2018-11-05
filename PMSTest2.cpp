@@ -28,29 +28,19 @@ class PMSTest2 {
   public:
     PMSTest2::PMSTest2(std::shared_ptr<Tape> inputTape) {}
     PMSTest2::PMSTest2(std::string _filename) : filename(_filename) {
-
-        Tapes.push_back(std::make_shared<Tape>());
-        std::default_random_engine gen(clock()); // clock()
-        std::uniform_real_distribution<double> dist(DIST_LOWER_LIMIT,
-                                                    DIST_UPPER_LIMIT);
-        std::uniform_int_distribution<int> distInt(1, 1);
-        auto generator = [&]() { return dist(gen); };
-        auto generatorInt = [&]() { return distInt(gen); };
-        for (int i = 0; i < 8 * (1 << 10); i++) {
-            std::vector<double> gen;
-            gen.push_back(generator());
-            Record rec(gen);
-            Tapes[0]->Push(rec);
-        }
-        Tapes.push_back(std::make_shared<Tape>());
-        Tapes.push_back(std::make_shared<Tape>());
+        Tapes.push_back(std::make_shared<Tape>(_filename, READONLY));
+        std::remove("t2.bin");
+        Tapes.push_back(std::make_shared<Tape>("t2.bin", WRITEONLY));
+        std::remove("t3.bin");
+        Tapes.push_back(std::make_shared<Tape>("t3.bin", WRITEONLY));
     }
     int PMSTest2::Distribute() {
         int phases = 0;
 
-        //    Tapes[0]->ChangeMode(READONLY);
+        Tapes[0]->ChangeMode(READONLY);
         Tapes[1]->Clear();
         Tapes[2]->Clear();
+
         std::shared_ptr<Tape> src = Tapes[0], dest = Tapes[1];
         long long fib = 1, fibOld = 0, fibCopy = fib;
         while (src->HasNext()) {
@@ -66,23 +56,43 @@ class PMSTest2 {
             dest->Push(rec);
         }
         dest->dummies = fib - dest->seriesCount;
+        Tapes[1]->BlockWrite();
+        Tapes[2]->BlockWrite();
         return phases;
     }
-    void PMSTest2::Print(int which = -1) {
-        std::cout << "PRINTING TapeS:" << std::endl;
-        if (which == -1) {
-            for (int i = 0; i < Tapes.size(); i++) {
-                std::cout << "==================== Tape" << std::endl;
-                std::cout << *Tapes[i] << std::endl;
-            }
-        } else {
-            std::cout << "==================== Tape" << std::endl;
-            std::cout << *Tapes[which] << std::endl;
+    void PMSTest2::Print() {
+        std::cout << "PRINTING TAPES:" << std::endl;
+        for (auto tape : Tapes) {
+            std::cout << "==================== TAPE - CURRENT "
+                      << tape->GetCurrent();
+            std::cout << *tape << std::endl;
         }
+    }
+    void PMSTest2::IsSorted(){
+        auto tape = std::make_shared<Tape>(filename, std::ios::in | std::ios::binary);
+        long long counter = 0;
+        bool isSorted = true;
+        auto prev = tape->GetNext();
+        while(tape->HasNext()) {
+            counter++;
+            auto next = tape->GetNext();
+            if(prev > next) {
+                isSorted = false;
+                break;
+            }
+            prev = next;
+        }
+        if(!isSorted)
+        std::cout << "NOT SORTED!" << std::endl;
+        else
+        std::cout << "SORTED! " << counter << " RECORDS TOTAL" << std::endl;
+
     }
     void PMSTest2::Merge() {
         Tapes[0]->Clear();
-
+ //       std::cout << std::endl << "NEW PHASE" << std::endl;
+ //       Print();
+        
         std::shared_ptr<Tape> Tape1 = Tapes[1], Tape2 = Tapes[2];
         Record record1, record2;
         // TODO: tu sie psuje
@@ -139,13 +149,12 @@ class PMSTest2 {
                 Tapes[0]->Push(min);
             }
         }
+        Tapes[0]->BlockWrite();
         /*
-        std::cout << std::endl << "NEW PHASE" << std::endl;
-//        Print();
         std::cout << "RECORD1: " << record1 << std::endl;
         std::cout << "RECORD2: " << record2 << std::endl;
         */
-        //    Tapes[0]->ChangeMode(READONLY);
+        Tapes[0]->ChangeMode(READONLY);
 
         if (Tapes[1]->HasNext())
             std::swap(Tapes[0], Tapes[2]);
@@ -153,11 +162,11 @@ class PMSTest2 {
             std::swap(Tapes[0], Tapes[1]);
     }
     void PMSTest2::Sort() {
-        //        Print(0);
+//        Print();
         int phases = Distribute();
-        //    Tapes[1]->ChangeMode(READONLY);
-        //    Tapes[2]->ChangeMode(READONLY);
-        //        Print();
+        Tapes[1]->ChangeMode(READONLY);
+        Tapes[2]->ChangeMode(READONLY);
+//        Print();
         for (int i = 0; i < phases; i++)
             Merge();
     }
