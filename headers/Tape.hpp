@@ -19,16 +19,15 @@ class Tape {
     bool isOpen;
     void OpenStream(int);
     Record lastRecord;
-
+    bool restore;
   public:
     bool inSeries;
     size_t seriesCount;
     int dummies;
     void CloseStream();
 
-    void WipeRead(int);
-    void WipeWrite(int);
-    void WipeAll(int);
+    void Clear();
+    void Restore();
 
     Tape(std::string _filePath, int);
     ~Tape();

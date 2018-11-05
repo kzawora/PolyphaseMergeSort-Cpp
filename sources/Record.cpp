@@ -1,4 +1,6 @@
-#include "CommonHeader.hpp"
+#include "Record.hpp"
+#include <algorithm>
+#include <iostream>
 #pragma once
 
 Record::Record() {}
@@ -39,5 +41,10 @@ std::ostream &operator<<(std::ostream &os, const Record &dt) {
     return os;
 }
 std::vector<double> Record::GetValues() { return this->values; };
-
+bool Record::operator==(const Record &rhs) const {
+    return this->values == rhs.values;
+};
+bool Record::operator!=(const Record &rhs) const {
+    return this->values != rhs.values;
+};
 bool Record::IsEmpty() { return this->values.size() == 0; }

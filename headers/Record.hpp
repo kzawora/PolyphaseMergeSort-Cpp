@@ -15,5 +15,8 @@ class Record {
     bool operator>(const Record &) const;
     bool operator<=(const Record &) const;
     bool operator>=(const Record &) const;
+    bool operator==(const Record &) const;
+    bool operator!=(const Record &) const;
+
     friend std::ostream &operator<<(std::ostream &, const Record &);
 };

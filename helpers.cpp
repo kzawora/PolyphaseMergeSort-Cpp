@@ -3,7 +3,7 @@
 static void GenerateTape(std::string path, int size) {
     std::fstream newFile;
     newFile.open(path, std::ios::out | std::ios::binary);
-    std::default_random_engine gen(clock());
+    std::default_random_engine gen(clock()); // clock()
     std::uniform_real_distribution<double> dist(DIST_LOWER_LIMIT,
                                                 DIST_UPPER_LIMIT);
     std::uniform_int_distribution<int> distInt(1, 1);

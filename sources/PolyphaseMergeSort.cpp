@@ -37,11 +37,11 @@ int PolyphaseMergeSort::Distribute() {
 }
 void PolyphaseMergeSort::Print() {
     std::cout << "PRINTING TAPES:" << std::endl;
-    //       for (auto tape : tapes) {
-    std::cout << "==================== TAPE - CURRENT "
-              << tapes[1]->GetCurrent();
-    std::cout << *tapes[1] << std::endl;
-    //     }
+//    for (auto tape : tapes) {
+        std::cout << "==================== TAPE - CURRENT "
+                  << tapes[1]->GetCurrent();
+        std::cout << *tapes[1] << std::endl;
+//    }
 }
 void PolyphaseMergeSort::Merge() {
     tapes[0]->CloseStream();
@@ -94,10 +94,10 @@ void PolyphaseMergeSort::Merge() {
         }
     }
     tapes[0]->BlockWrite();
- //   Print();
+    std::cout << std::endl << "NEW PHASE" << std::endl;
+//    Print();
     tapes[0]->ChangeMode(READONLY);
 
-    auto temp = tapes[0];
     if (tapes[1]->HasNext())
         std::swap(tapes[0], tapes[2]);
     else

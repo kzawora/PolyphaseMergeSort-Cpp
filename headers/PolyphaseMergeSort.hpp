@@ -1,6 +1,7 @@
 #include "Tape.hpp"
 #include <iostream>
 #include <vector>
+#include <memory>
 #pragma once
 enum io {
     READONLY = std::ios::in | std::ios::binary,
