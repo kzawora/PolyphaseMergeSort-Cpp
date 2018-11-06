@@ -38,10 +38,12 @@ int main() {
             std::cout << "NOT EQUAL!" << std::endl;
     }
     */
-    GenerateTape("test.bin", 40);
-    PMSTest2 x("test.bin");
-    std::string sortedPath = x.Sort();
-    IsSorted(sortedPath);
-
+    for (int i = 1; i <= 1000000; i = i * 10) {
+        size_t size = i;
+        GenerateTape("test.bin", size);
+        PMSTest2 x("test.bin", size);
+        std::string sortedPath = x.Sort();
+        IsSorted(sortedPath);
+    }
     return 0;
 }

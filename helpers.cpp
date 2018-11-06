@@ -6,7 +6,7 @@ static void GenerateTape(std::string path, int size) {
     std::default_random_engine gen(clock()); // clock()
     std::uniform_real_distribution<double> dist(DIST_LOWER_LIMIT,
                                                 DIST_UPPER_LIMIT);
-    std::uniform_int_distribution<int> distInt(1, 15);
+    std::uniform_int_distribution<int> distInt(1, 1);
     auto generator = [&]() { return dist(gen); };
     auto generatorInt = [&]() { return distInt(gen); };
     for (int i = 0; i < size; i++) {
@@ -22,10 +22,13 @@ static void GenerateTape(std::string path, int size) {
 }
 
 static void IsSorted(std::string filename) {
-    std::cout << "CHECKING: " << filename << std::endl;
+    std::cout << std::endl << "======== SORT CHECK ========" << std::endl;
+    std::cout << "==== CHECKING: " << filename << " ====" << std::endl;
     auto tape =
         std::make_shared<Tape>(filename, std::ios::in | std::ios::binary);
+#if PRINT_TAPES == 1
     std::cout << *tape << std::endl;
+#endif
     long long counter = 1;
     bool isSorted = true;
     auto prev = tape->GetNext();

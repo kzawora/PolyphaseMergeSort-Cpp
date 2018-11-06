@@ -5,7 +5,7 @@
 class Block {
     std::vector<Record> values;
     size_t currentPos;
-
+    size_t sizeInBytes;
   public:
     size_t endInTape;
     Block();

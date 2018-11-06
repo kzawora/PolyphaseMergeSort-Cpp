@@ -14,13 +14,17 @@ void Tape::Restore() { this->restore = true; }
 std::vector<double> Tape::GetNextBlock() {
     const size_t arraySize = BLOCK_SIZE / sizeof(double);
     int position = static_cast<int>(file.tellg());
-    diskOpCounter++;          // DISKOP: file.tellg()
     double x[arraySize] = {}; // TODO: zera binarne?
-    if (file && (position + BLOCK_SIZE <= fileSize))
+    if (file && (position + BLOCK_SIZE <= fileSize)) {
         file.read(reinterpret_cast<char *>(&x), BLOCK_SIZE);
-    else if (file)
+        diskOpCounter++; // DISKOP: file.read(...)
+        reads++;    // TODO: remove this
+
+    } else if (file) {
         file.read(reinterpret_cast<char *>(&x), fileSize - position);
-    diskOpCounter++; // DISKOP: file.read(...)
+        diskOpCounter++; // DISKOP: file.read(...)
+        reads++;    // TODO: remove this
+    }
     return std::vector<double>(x, x + sizeof x / sizeof x[0]);
 }
 bool Tape::HasNextBlock() {
@@ -33,20 +37,15 @@ bool Tape::HasNextBlock() {
 void Tape::OpenStream(int mode) {
     std::ifstream file_temp(filePath, std::ios::binary | std::ios::ate);
     this->fileSize = file_temp.tellg();
-    diskOpCounter++; // DISKOP: file.tellg()
     file_temp.close();
     file.open(filePath, mode);
-    diskOpCounter++; // DISKOP: file.open()
 }
-void Tape::CloseStream() {
-    file.close();
-}
+void Tape::CloseStream() { file.close(); }
 
 Block Tape::BlockRead() {
     auto block = GetNextBlock();
     std::vector<Record> records;
     Record record;
-    diskOpCounter++; // DISKOP: file.tellg()
     for (auto val : block) {
         if (!std::isnan(val))
             record.Push(val);
@@ -61,7 +60,6 @@ Block Tape::BlockRead() {
     Block res(records);
     res.endInTape = (file.tellg());
     file.seekg(lastTapePos, std::ios_base::beg);
-    //   diskOpCounter++;       // DISKOP: file.seekg()
     return res; // co zrobic z ostatnim rekordem?
 }
 
@@ -80,6 +78,7 @@ void Tape::BlockWrite() {
                    result.size() * sizeof(double));
         file.flush();
         diskOpCounter++; // DISKOP: file.write(...)
+        writes++;    // TODO: remove this
     }
 }
 bool Tape::HasNext() {
@@ -133,7 +132,8 @@ void Tape::Push(Record rec) {
 
     this->lastRecord = rec;
     writeBlock.Push(rec);
-    if (this->writeBlock.GetSizeInBytes() >= BLOCK_SIZE) {
+    auto size = this->writeBlock.GetSizeInBytes();
+    if (size >= BLOCK_SIZE) {
         BlockWrite();
         writeBlock.Clear();
     }
@@ -162,9 +162,12 @@ std::ostream &operator<<(std::ostream &os, const Tape &tp) {
     long long counter2 = 1;
     while (tape->HasNext()) {
         auto x = tape->GetNext();
-        if (++counter + (int)tp.restore > tp.popCnt) {
-            if (tape->inSeries == false)
+        // if (++counter + (int)tp.restore > tp.popCnt) {
+        if (++counter > tp.popCnt) {
+#if PRINT_SERIES == 1
+            if (tape->inSeries == false && counter2 != 1)
                 os << "SERIES BREAK" << std::endl;
+#endif
             os << counter2++ << '\t' << x;
         }
     }

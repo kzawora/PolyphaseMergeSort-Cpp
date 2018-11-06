@@ -1,3 +1,4 @@
+#include "CommonHeader.hpp"
 #include "Record.hpp"
 #include "Tape.hpp"
 #include <algorithm>
@@ -9,11 +10,6 @@
 #include <vector>
 #pragma once
 
-#define PRINT_TAPES 1
-
-// for TapeGenerator
-#define DIST_LOWER_LIMIT 0
-#define DIST_UPPER_LIMIT 100
 #include <memory>
 #include <queue>
 #pragma once
@@ -21,14 +17,20 @@ enum io {
     READONLY = std::ios::in | std::ios::binary,
     WRITEONLY = std::ios::out | std::ios::binary | std::ios::app,
 };
-
+#if PRINT_TAPES == 1
+static int _phasecnt = 0;
+#endif
 class PMSTest2 {
     std::vector<std::shared_ptr<Tape>> Tapes;
     std::string filename;
+    int phases;
+    double elapsedTime;
+    int series;
+    int elements;
 
   public:
-    PMSTest2::PMSTest2(std::shared_ptr<Tape> inputTape) {}
-    PMSTest2::PMSTest2(std::string _filename) : filename(_filename) {
+    PMSTest2::PMSTest2(std::string _filename, int elems)
+        : filename(_filename), elements(elems) {
         Tapes.push_back(std::make_shared<Tape>(_filename, READONLY));
         std::remove("t2.bin");
         Tapes.push_back(std::make_shared<Tape>("t2.bin", WRITEONLY));
@@ -36,7 +38,7 @@ class PMSTest2 {
         Tapes.push_back(std::make_shared<Tape>("t3.bin", WRITEONLY));
     }
     int PMSTest2::Distribute() {
-        int phases = 0;
+        phases = 0;
 
         Tapes[0]->ChangeMode(READONLY);
         Tapes[1]->Clear();
@@ -59,27 +61,52 @@ class PMSTest2 {
         dest->dummies = fib - dest->seriesCount;
         Tapes[1]->BlockWrite();
         Tapes[2]->BlockWrite();
+        series = Tapes[1]->seriesCount + Tapes[2]->seriesCount;
         return phases;
     }
     void PMSTest2::Print() {
-        std::cout << "PRINTING TAPES:" << std::endl;
         for (auto tape : Tapes) {
-            std::cout << "==================== TAPE - CURRENT "
-                      << tape->GetCurrent();
-            std::cout << *tape << std::endl;
+            std::cout << "==== TAPE - " << tape->GetFilePath();
+            if (tape->dummies > 0)
+                std::cout << " (" << tape->dummies << " dummy series)";
+            std::cout << " ====" << std::endl;
+            if (tape->HasNext())
+                std::cout << *tape << std::endl;
         }
     }
-
+    void PMSTest2::GenerateReport() {
+        //  2
+        double diskopCalc = 2 * elements * (1 + 1) * sizeof(double) *
+                              (1.04 * std::log2(series) + 1) / BLOCK_SIZE;
+        int diskops = 0;
+        for (auto tape : Tapes) {
+            diskops += tape->GetDiskOpCount();
+        }
+        std::cout << std::endl
+                  << "======== REPORT AFTER SORTING ========" << std::endl;
+        std::cout << "==== "
+                  << "SIZE: " << elements << " records" << std::endl;
+        std::cout << "==== "
+                  << "BLOCK SIZE: " << BLOCK_SIZE << " bytes" << std::endl;
+        std::cout << "==== "
+                  << "SERIES COUNT: " << series << std::endl;
+        std::cout << "==== "
+                  << "PHASES: " << phases << std::endl;
+        std::cout << "==== "
+                  << "THEORETICAL PHASES: "
+                  << (1.45 * std::log2(series)) << std::endl;
+        std::cout << "==== "
+                  << "DISK OPERATIONS: " << diskops << std::endl;
+        std::cout << "==== "
+                  << "THEORETICAL DISKOPS: " << diskopCalc << std::endl;
+        std::cout << "==== "
+                  << "TIME: " << elapsedTime << " seconds" << std::endl;
+    }
     void PMSTest2::Merge() {
         Tapes[0]->Clear();
-        //       std::cout << std::endl << "NEW PHASE" << std::endl;
-        //       Print();
 
         std::shared_ptr<Tape> Tape1 = Tapes[1], Tape2 = Tapes[2];
         Record record1, record2;
-        // TODO: tu sie psuje
-        // Tape1->ChangeMode(READONLY);
-        // Tape2->ChangeMode(READONLY);
 
         while (Tape1->HasNext() && Tape2->HasNext()) {
             if (Tape1->dummies > 0) {
@@ -132,10 +159,13 @@ class PMSTest2 {
             }
         }
         Tapes[0]->BlockWrite();
-        /*
-        std::cout << "RECORD1: " << record1 << std::endl;
-        std::cout << "RECORD2: " << record2 << std::endl;
-        */
+
+#if PRINT_TAPES == 1
+        std::cout << std::endl
+                  << "======== MERGE AT PHASE " << ++_phasecnt
+                  << " ========" << std::endl;
+        Print();
+#endif
         Tapes[0]->ChangeMode(READONLY);
 
         if (Tapes[1]->HasNext())
@@ -144,13 +174,26 @@ class PMSTest2 {
             std::swap(Tapes[0], Tapes[1]);
     }
     std::string PMSTest2::Sort() {
-        //        Print();
+        clock_t begin = std::clock();
+
+#if PRINT_TAPES == 1
+        std::cout << "======== TAPES BEFORE DISTRIBUTION ========" << std::endl;
+        Print();
+#endif
         int phases = Distribute();
+        Tapes[0]->Clear(); // to moze zepsuc cos
         Tapes[1]->ChangeMode(READONLY);
         Tapes[2]->ChangeMode(READONLY);
-        //        Print();
+
+#if PRINT_TAPES == 1
+        std::cout << "======== TAPES AFTER DISTRIBUTION ========" << std::endl;
+        Print();
+#endif
         for (int i = 0; i < phases; i++)
             Merge();
+        clock_t end = std::clock();
+        elapsedTime = double(end - begin) / CLOCKS_PER_SEC;
+        GenerateReport();
         return Tapes[0]->GetFilePath();
     }
     PMSTest2::~PMSTest2() {}
