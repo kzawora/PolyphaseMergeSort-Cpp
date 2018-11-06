@@ -38,7 +38,9 @@ void Tape::OpenStream(int mode) {
     file.open(filePath, mode);
     diskOpCounter++; // DISKOP: file.open()
 }
-void Tape::CloseStream() { file.close(); }
+void Tape::CloseStream() {
+    file.close();
+}
 
 Block Tape::BlockRead() {
     auto block = GetNextBlock();
@@ -72,11 +74,13 @@ void Tape::BlockWrite() {
         result.insert(result.end(), toInsert.begin(), toInsert.end());
         result.push_back(SEPARATOR_VALUE);
     }
-    double *toWrite = &result[0];
-    file.write(reinterpret_cast<char *>(toWrite),
-               result.size() * sizeof(double));
-    file.flush();
-    diskOpCounter++; // DISKOP: file.write(...)
+    if (result.size() > 0) {
+        double *toWrite = &result[0];
+        file.write(reinterpret_cast<char *>(toWrite),
+                   result.size() * sizeof(double));
+        file.flush();
+        diskOpCounter++; // DISKOP: file.write(...)
+    }
 }
 bool Tape::HasNext() {
     if (restore)
@@ -155,12 +159,13 @@ std::ostream &operator<<(std::ostream &os, const Tape &tp) {
     auto tape = std::make_shared<Tape>(name, std::ios::in | std::ios::binary);
 
     long long counter = 1;
+    long long counter2 = 1;
     while (tape->HasNext()) {
         auto x = tape->GetNext();
         if (++counter + (int)tp.restore > tp.popCnt) {
             if (tape->inSeries == false)
                 os << "SERIES BREAK" << std::endl;
-            os << counter << '\t' << x;
+            os << counter2++ << '\t' << x;
         }
     }
     return os;

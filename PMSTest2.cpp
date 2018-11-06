@@ -9,10 +9,11 @@
 #include <vector>
 #pragma once
 
+#define PRINT_TAPES 1
+
 // for TapeGenerator
 #define DIST_LOWER_LIMIT 0
 #define DIST_UPPER_LIMIT 100
-
 #include <memory>
 #include <queue>
 #pragma once
@@ -68,31 +69,12 @@ class PMSTest2 {
             std::cout << *tape << std::endl;
         }
     }
-    void PMSTest2::IsSorted(){
-        auto tape = std::make_shared<Tape>(filename, std::ios::in | std::ios::binary);
-        long long counter = 0;
-        bool isSorted = true;
-        auto prev = tape->GetNext();
-        while(tape->HasNext()) {
-            counter++;
-            auto next = tape->GetNext();
-            if(prev > next) {
-                isSorted = false;
-                break;
-            }
-            prev = next;
-        }
-        if(!isSorted)
-        std::cout << "NOT SORTED!" << std::endl;
-        else
-        std::cout << "SORTED! " << counter << " RECORDS TOTAL" << std::endl;
 
-    }
     void PMSTest2::Merge() {
         Tapes[0]->Clear();
- //       std::cout << std::endl << "NEW PHASE" << std::endl;
- //       Print();
-        
+        //       std::cout << std::endl << "NEW PHASE" << std::endl;
+        //       Print();
+
         std::shared_ptr<Tape> Tape1 = Tapes[1], Tape2 = Tapes[2];
         Record record1, record2;
         // TODO: tu sie psuje
@@ -158,17 +140,18 @@ class PMSTest2 {
 
         if (Tapes[1]->HasNext())
             std::swap(Tapes[0], Tapes[2]);
-        else
+        else if (Tapes[2]->HasNext())
             std::swap(Tapes[0], Tapes[1]);
     }
-    void PMSTest2::Sort() {
-//        Print();
+    std::string PMSTest2::Sort() {
+        //        Print();
         int phases = Distribute();
         Tapes[1]->ChangeMode(READONLY);
         Tapes[2]->ChangeMode(READONLY);
-//        Print();
+        //        Print();
         for (int i = 0; i < phases; i++)
             Merge();
+        return Tapes[0]->GetFilePath();
     }
     PMSTest2::~PMSTest2() {}
 };

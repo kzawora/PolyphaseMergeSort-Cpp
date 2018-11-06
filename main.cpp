@@ -38,10 +38,10 @@ int main() {
             std::cout << "NOT EQUAL!" << std::endl;
     }
     */
-    GenerateTape("test.bin", 1 << 20);
+    GenerateTape("test.bin", 40);
     PMSTest2 x("test.bin");
-    x.Sort();
-    x.IsSorted();
+    std::string sortedPath = x.Sort();
+    IsSorted(sortedPath);
 
     return 0;
 }

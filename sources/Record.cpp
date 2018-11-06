@@ -1,6 +1,4 @@
-#include "Record.hpp"
-#include <algorithm>
-#include <iostream>
+#include "CommonHeader.hpp"
 #pragma once
 
 Record::Record() {}

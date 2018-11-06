@@ -11,16 +11,15 @@
 #include <vector>
 #pragma once
 
-#define _DEBUG_SORT_ 0
+// for Record
+#define _DEBUG_SORT_ 1
 
 // for TapeGenerator
-#define DIST_LOWER_LIMIT 0
-#define DIST_UPPER_LIMIT 100
+#define DIST_LOWER_LIMIT -49
+#define DIST_UPPER_LIMIT 59
 
-// for Tape.hpp
-
+// for Tape
 #define BLOCK_SIZE 4 * (1 << 10)
 #define WRITE_BLOCK_SIZE 4 * (1 << 10)
 
 #define SEPARATOR_VALUE std::nan("")
-#define _DEBUG_ 0
