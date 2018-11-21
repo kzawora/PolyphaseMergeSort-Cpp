@@ -1,18 +1,23 @@
 #include "Tape.hpp"
-#include <iostream>
-#include <vector>
 #include <memory>
+#include <vector>
 #pragma once
 
 class PolyphaseMergeSort {
     std::vector<std::shared_ptr<Tape>> tapes;
     std::string filename;
+    int phases{0};
+    double elapsedTime{0.};
+    int series{0};
+    int elements;
+    int inputSize;
+    
   public:
-    PolyphaseMergeSort(std::shared_ptr<Tape> inputTape);
-    PolyphaseMergeSort(std::string _filename);
+    PolyphaseMergeSort(std::string _filename, int elems);
     int Distribute();
     void Print();
+    void GenerateReport();
     void Merge();
-    void Sort();
+    std::string Sort();
     ~PolyphaseMergeSort();
 };

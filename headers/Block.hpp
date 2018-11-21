@@ -4,22 +4,20 @@
 
 class Block {
     std::vector<Record> values;
-    size_t currentPos;
+    int currentPos;
     size_t sizeInBytes;
+
   public:
     size_t endInTape;
     Block();
-    Block(std::vector<Record>);
+    explicit Block(std::vector<Record>);
     ~Block();
     std::vector<Record> GetValues();
     Record GetNextRecord();
-    Record PeekNextRecord();
     Record GetCurrentRecord();
-    void SetPos(size_t);
     bool HasNextRecord();
-    size_t GetPos();
     void Push(Record);
     size_t GetSize();
-    size_t Block::GetSizeInBytes();
+    size_t GetSizeInBytes();
     void Clear();
 };

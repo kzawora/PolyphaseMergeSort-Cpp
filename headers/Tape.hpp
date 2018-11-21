@@ -5,42 +5,50 @@
 #pragma once
 
 class Tape {
+    // internal tape management variables
     long long diskOpCounter;
     long long lastTapePos;
     size_t fileSize;
     std::fstream file;
     std::string filePath;
-    int mode;
-    std::vector<double> GetNextBlock();
-    Block readBlock;
-    Block writeBlock;
-    bool HasNextBlock();
-    Block BlockRead();
-    bool isOpen;
-    void OpenStream(int);
     Record lastRecord;
     bool restore;
-  public:
     int popCnt;
+
+    // stream management
+    void OpenStream(std::ios_base::openmode);
+    void CloseStream();
+
+    // block management
+    Block readBlock;
+    Block writeBlock;
+    Block BlockRead();
+    bool HasNextBlock();
+    std::vector<double> GetNextBlock();
+
+  public:
+    // algorithm specific variables useful for programmer
     bool inSeries;
     size_t seriesCount;
     int dummies;
-    void CloseStream();
 
-    void Clear();
-    void Restore();
-
-    Tape(std::string _filePath, int);
+    // constructors/destructors
+    Tape(std::string _filePath, std::ios_base::openmode);
     ~Tape();
-    void ChangeMode(int);
+
+    // stream management API
+    void Clear();
+    void ChangeMode(std::ios_base::openmode);
     long long GetDiskOpCount();
+    int GetFileSize();
+    
+    // tape managment API
     bool HasNext();
-    std::string GetFilePath() const;
     Record GetNext();
-    Record PeekNext();
-    Record GetCurrent();
     void Push(Record);
-    void BlockWrite();
+    void BlockWrite(); // TODO: rename to flush()
+    void Restore();
+    std::string GetFilePath() const;
 
     friend std::ostream &operator<<(std::ostream &, const Tape &);
 };

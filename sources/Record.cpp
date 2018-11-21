@@ -1,8 +1,9 @@
 #include "CommonHeader.hpp"
-#pragma once
+#include <utility>
 
-Record::Record() {}
-Record::Record(std::vector<double> x) : values(x) {}
+Record::Record() = default;
+
+Record::Record(std::vector<double> x) : values(std::move(x)) {}
 
 bool Record::operator<(const Record &rhs) const {
     std::vector<double> lCopy = this->values, rCopy = rhs.values;
@@ -45,4 +46,4 @@ bool Record::operator==(const Record &rhs) const {
 bool Record::operator!=(const Record &rhs) const {
     return this->values != rhs.values;
 };
-bool Record::IsEmpty() { return this->values.size() == 0; }
+bool Record::IsEmpty() { return this->values.empty(); }

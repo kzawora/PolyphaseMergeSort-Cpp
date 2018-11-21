@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #pragma once
 class Record {
@@ -5,7 +6,8 @@ class Record {
 
   public:
     Record();
-    Record(std::vector<double> x);
+
+    explicit Record(std::vector<double> x);
     bool IsEmpty();
 
     void Push(double val);

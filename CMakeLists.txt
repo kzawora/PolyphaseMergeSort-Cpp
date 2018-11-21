@@ -1,12 +1,20 @@
-cmake_minimum_required(VERSION 2.8)
-file(GLOB SBDProjekt1_SRC
-    "*.hpp"
-    "*.cpp"
-	"sources/*.hpp"
-    "sources/*.cpp"
-	"headers/*.hpp"
-    "headers/*.cpp"
-)
+cmake_minimum_required(VERSION 3.12)
+project(SBDProjekt1)
 
-include_directories(${PROJECT_SOURCE_DIR}/headers)
-add_executable(SBDProjekt1 ${SBDProjekt1_SRC})
+set(CMAKE_CXX_STANDARD 14)
+
+include_directories(headers)
+
+add_executable(SBDProjekt1
+        headers/Block.hpp
+        headers/CommonHeader.hpp
+        headers/PolyphaseMergeSort.hpp
+        headers/Record.hpp
+        headers/Tape.hpp
+        sources/Block.cpp
+        sources/PolyphaseMergeSort.cpp
+        sources/Record.cpp
+        sources/Tape.cpp
+        helpers.cpp
+        main.cpp
+        )

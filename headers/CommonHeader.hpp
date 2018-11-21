@@ -11,22 +11,21 @@
 #include <vector>
 #pragma once
 
-static int reads = 0;
-static int writes = 0;
-
-#define PRINT_TAPES 0
-
+// printing
+#define PRINT_TAPES         1
+#define PRINT_SERIES        1
 // for Record
-#define _DEBUG_SORT_ 1
+#define _DEBUG_SORT_        1
 
 // for TapeGenerator
-#define DIST_LOWER_LIMIT -49
-#define DIST_UPPER_LIMIT 59
+// for TapeGenerator
+#define DIST_LOWER_LIMIT    (-100)
+#define DIST_UPPER_LIMIT    (100)
+#define RECORD_MIN_SIZE     (1)
+#define RECORD_MAX_SIZE     (15)
 
 // for Tape
-#define BLOCK_SIZE (4 * (1 << 10))
-#define WRITE_BLOCK_SIZE BLOCK_SIZE
-
-#define SEPARATOR_VALUE std::nan("")
-
-#define PRINT_SERIES 1
+#define BLOCK_SIZE          (4 * (1 << 10))
+#define SEPARATOR_VALUE     std::nan("")
+constexpr auto READONLY  =  std::ios::in | std::ios::binary;
+constexpr auto WRITEONLY =  std::ios::out | std::ios::binary | std::ios::app;
